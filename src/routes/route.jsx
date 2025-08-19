@@ -13,6 +13,7 @@ export default function Router() {
       <Route path="/search" element={<Search />} />
       <Route path="/notification" element={<Notification />} />
       <Route path="/user/:id" element={<User />} />
+      <Route path="/daily-task-list" element={<DailyTaskList />}/>
     </Routes>
   );
 }
