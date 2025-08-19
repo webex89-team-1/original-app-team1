@@ -4,6 +4,7 @@ import Timeline from "@/src/pages/Timeline.jsx";
 import Search from "@/src/pages/Search.jsx";
 import Notification from "@/src/pages/Notification.jsx";
 import User from "@/src/pages/User.jsx";
+import DailyTaskList from "../pages/DailyTaskList";
 
 export default function Router() {
   return (
