@@ -5,7 +5,7 @@ import {collection, addDoc} from "firebase/firestore";
 import {db, auth} from "./firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-
+import './App.css';
 
 function App() {
   const [showpwd, setShowpwd] = React.useState(false);
@@ -51,34 +51,43 @@ function App() {
     }
   }
   return (
-    <div>
-      <h1>ログイン</h1>
-      <p>メールアドレスとパスワードを入力してください</p>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label>
-            メールアドレス:
-            <input type="email" name="username" required />
-          </label>
+    <div className="login-container">
+      <div className="brand-panel">
+        <div className="logo">
+          <div crassName="logo-shape"></div>
         </div>
-        <div>
-          <label>
-            パスワード:
-            <input type={showpwd ? "text" : "password"} name="password" required />
-          </label>
-          <button type="button" onClick={() => setShowpwd(!showpwd)}>
-            {showpwd ? "非表示" : "表示"}
+        <h1>TaskManager</h1>
+      </div>
+      <div className="form-panel">
+        <form onSubmit={onSubmit}>
+          <div>
+            <label>
+              メールアドレス:
+              <input type="email" name="username" required />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              パスワード:
+            </label>
+            <div className= "password-input-container">
+              <input type={showpwd ? "text" : "password"} name="password" required />
+              <button type="button" onClick={() => setShowpwd(!showpwd)}>
+                {showpwd ? "非表示" : "表示"}
+              </button>
+            </div>
+          </div>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? "読み込み中..." : "ログイン"}
           </button>
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? "読み込み中..." : "ログイン"}
-        </button>
-      </form>
-      <p>
-        アカウントをお持ちでないですか？ <Link to="/register">新規登録</Link>
-      </p>
+          <p className="signup-link">
+            アカウントをお持ちでないですか？ <Link to="/register">新規登録</Link>
+          </p>
+        </form>
     </div>
+  </div>
   );
 }
+
 export default App;
