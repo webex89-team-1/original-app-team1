@@ -29,7 +29,8 @@ body {
 /* 左側のブランドパネル */
 .brand-panel {
     flex-basis: 50%;
-    background-image: url("C:\Users\motch\webex\original-app-team1\picture\背景グラデーション.png");
+    background-image: url(
+        "C:\Users\motch\webex\original-app-team1\picture\ログイン背景.png");
     background-size: cover;
     background-position: center;
     color: #000000;
@@ -45,7 +46,8 @@ body {
     margin-bottom: 20px;
     width: 140px;
     height: 140px;
-    background-image: url("C:\Users\motch\webex\original-app-team1\picture\PhotoCat-background-remover.png");
+    background-image: url(
+        "C:\Users\motch\webex\original-app-team1\picture\アイコン.png");
     background-size: contain;   
     background-repeat: no-repeat;
     background-position: center;
@@ -175,11 +177,9 @@ button[type="submit"]:disabled {
   position: relative;
 }
 .password-input-container input {
-  padding-right: 70px; /* ボタンの幅分の余白を追加 */
+  padding-right: 70px; 
 }
 .password-input-container button {
-  /* ボタンの見た目を調整（任意）*/
-  /* 例えば、高さを入力欄に合わせるなど */
   position: absolute;
   right: 10px;
   top: 50%;
@@ -190,5 +190,5 @@ button[type="submit"]:disabled {
   font-size: 0.9rem;
   cursor: pointer;
   padding: 15px 10px;
-  flex-shrink: 0; /* ボタンが縮まないようにします */
+  flex-shrink: 0; 
 }
