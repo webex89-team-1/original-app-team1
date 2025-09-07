@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "./firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { auth } from "./firebase";
 import { useNavigate } from "react-router-dom";
 import './App.css';
 
@@ -30,7 +29,7 @@ function Register() {
     }
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigate("/");
+      navigate("/avatar");
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setError("このメールアドレスは既に使用されています");
@@ -66,7 +65,7 @@ function Register() {
             <div className= "form-group">
               <label>
                 メールアドレス:
-                <input type="email" name="username" required />
+                <input type="email" name="email" required />
               </label>
             </div>
             <div className="form-group">

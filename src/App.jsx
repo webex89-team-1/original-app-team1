@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; 
 import React from "react"; 
-import { useState } from "react";
+//import { useState } from "react";
 import {collection, addDoc} from "firebase/firestore";
-import {db, auth} from "./firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {db, auth} from "./firebase"; 
+import { signInWithEmailAndPassword } from "firebase/auth";  
 import { useNavigate } from "react-router-dom";
 import './App.css';
 
@@ -11,21 +11,22 @@ function App() {
   const [showpwd, setShowpwd] = React.useState(false);
   const[loading, setLoading] = React.useState(false);
   const[error, setError] = React.useState(null);
-  const[data, setData] = useState([])
+
+
   const navigate = useNavigate();
 
-  async function onSubmit(e) {
+  async function onSubmit(e) { //フォームの送信イベントを処理する非同期関数
     e.preventDefault();
     setLoading(true);
     setError(null);
-    if (loading) return; // 多重送信防止
-    if (error) setError(null); // エラーリセット
+    if (loading) return; 
+    if (error) setError(null); 
     if (!e.target.checkValidity()) {
       setError("フォームの入力が正しくありません");
       setLoading(false);
       return;
     }
-    try {
+    try { //ログイン処理を試みる
       const form = e.target;
       const formData = new FormData(form);
       const email = formData.get("username");
@@ -35,7 +36,7 @@ function App() {
         email,loginAt: new Date()
       });
       navigate("/home");
-      // ログイン成功後の処理（例: トークンの保存、リダイレクトなど）
+      // ログイン成功後の処理
     } catch (err) {
       if (err.code === "auth/user-not-found") {
         setError("ユーザーが見つかりません");
@@ -54,7 +55,7 @@ function App() {
     <div className="login-container">
       <div className="brand-panel">
         <div className="logo">
-          <div crassName="logo-shape"></div>
+          <div className="logo-shape"></div>
         </div>
         <h1>TaskManager</h1>
       </div>
