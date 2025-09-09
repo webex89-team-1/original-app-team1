@@ -1,0 +1,94 @@
+.stopwatch-container {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: white;
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 350px;
+}
+
+h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.display {
+    font-size: 4em;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-bottom: 25px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #e8f5e9;
+    min-width: 250px;
+}
+
+.controls button {
+    font-size: 1.2em;
+    padding: 12px 25px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+    color: white;
+}
+
+#startStopBtn {
+    background-color: #4CAF50;
+}
+
+#startStopBtn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+#resetBtn {
+    background-color: #f44336;
+}
+
+#resetBtn:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
+
+#saveBtn {
+    background-color: #2196F3;
+}
+
+#saveBtn:hover {
+    background-color: #1e88e5;
+    transform: scale(1.05);
+}
+
+.records-container {
+    margin-top: 30px;
+    text-align: left;
+    width: 100%;
+}
+
+.records-container h2 {
+    color: #555;
+    font-size: 1.8em;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+}
+
+#recordList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#recordList li {
+    background-color: #fafafa;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    font-size: 1.1em;
+}
