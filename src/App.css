@@ -234,3 +234,48 @@ button[type="submit"]:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
+
+.home-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.profile-tab {
+    flex-basis: 20%;
+    background-color: #e9e3e3;
+    display: grid;
+    justify-content: center;
+    margin-right: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.profile-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tab-panel {
+    background-color: #e2e1e1;
+    display: grid;
+    gap: 20px;
+    flex-direction: column;
+    align-items: start;
+    padding: 20px;
+    box-sizing: border-box;
+    justify-content: flex-start
+}
+.post-panel {
+    flex-basis: 80%;
+    background-color: #ece8e8;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    box-sizing: border-box;
+}

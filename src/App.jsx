@@ -35,7 +35,7 @@ function App() {
       await addDoc(collection(db, "users"), {
         email,loginAt: new Date()
       });
-      navigate("/home");
+      navigate("/post");
       // ログイン成功後の処理
     } catch (err) {
       if (err.code === "auth/user-not-found") {

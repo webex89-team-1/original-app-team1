@@ -7,6 +7,7 @@ import User from "../pages/User.jsx";
 import Register from "../Register.jsx";
 import Avatar from "../Avatar.jsx";
 import Home from "../Home.jsx";
+import Post from "../Post.jsx";
 
 export default function Router() {
   return (
@@ -19,6 +20,7 @@ export default function Router() {
         <Route path="/register" element={<Register />} />
         <Route path="/avatar" element={<Avatar />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/post" element={<Post />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
   );
