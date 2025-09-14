@@ -1,20 +1,27 @@
-import { Route, Routes } from "react-router";
-import App from "@/src/App.jsx";
-import Timeline from "@/src/pages/Timeline.jsx";
-import Search from "@/src/pages/Search.jsx";
-import Notification from "@/src/pages/Notification.jsx";
-import User from "@/src/pages/User.jsx";
-import Stopwatch from "@/src/pages/Stopwatch.jsx";
+import { Route, Routes } from "react-router-dom";
+import App from "../App.jsx";
+import Timeline from "../pages/Timeline.jsx";
+import Search from "../pages/Search.jsx";
+import Notification from "../pages/Notification.jsx";
+import User from "../pages/User.jsx";
+import Register from "../Register.jsx";
+import Avatar from "../Avatar.jsx";
+import Home from "../Home.jsx";
+import Post from "../Post.jsx";
 
 export default function Router() {
   return (
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/timeline" element={<Timeline />} />
-      <Route path="/search" element={<Search />} />
-      <Route path="/notification" element={<Notification />} />
-      <Route path="/user/:id" element={<User />} />
-      <Route path="/stopwatch" element={<Stopwatch />} />
-    </Routes>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/timeline" element={<Timeline />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/notification" element={<Notification />} />
+        <Route path="/user/:id" element={<User />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/avatar" element={<Avatar />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/post" element={<Post />} />
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Routes>
   );
 }
