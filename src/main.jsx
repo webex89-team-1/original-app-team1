@@ -1,11 +1,10 @@
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router";
-import Router from "./routes/route.jsx";
+// import './index.css' ← この行を削除またはコメントアウト
+import App from "./App.jsx";
 
-const root = createRoot(document.getElementById("root"));
-
-root.render(
-  <BrowserRouter>
-    <Router />
-  </BrowserRouter>
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
 );

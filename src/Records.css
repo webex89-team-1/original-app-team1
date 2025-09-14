@@ -1,0 +1,18 @@
+.records {
+  padding: 80px; /* グラフの上下の余白の幅 */
+  max-width: 700px; /* 画面サイズに応じた幅 */
+  margin: auto; /* 中央寄せ */
+  font-family: sans-serif;
+}
+
+.graph-show-button {
+  background-color: #deb887;
+  color: black;
+  border: none;
+  padding: 10px 16px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease;
+}
