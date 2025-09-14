@@ -1,10 +1,15 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-// import './index.css' ← この行を削除またはコメントアウト
-import App from "./App.jsx";
+import { BrowserRouter } from "react-router-dom";
+import "./App.css";
+import "./firebase.js" 
+import Router from "./routes/route.jsx";
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+
+const root = createRoot(document.getElementById("root"));
+
+root.render(
+  <BrowserRouter>
+    <Router />
+  </BrowserRouter>
 );
