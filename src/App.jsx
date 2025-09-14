@@ -1,56 +1,94 @@
-import { useState } from "react";
-import "./App.css";
-import Records from "./Records.jsx";
+import { Link } from "react-router-dom"; 
+import React from "react"; 
+//import { useState } from "react";
+import {collection, addDoc} from "firebase/firestore";
+import {db, auth} from "./firebase"; 
+import { signInWithEmailAndPassword } from "firebase/auth";  
+import { useNavigate } from "react-router-dom";
+import './App.css';
 
 //関数を実行
 function App() {
-  //初期値をToDoに設定
-  const [activeTab, setActiveTab] = useState("To Do"); //状態管理を設定して、初期値を"ToDo"にする
+  const [showpwd, setShowpwd] = React.useState(false);
+  const[loading, setLoading] = React.useState(false);
+  const[error, setError] = React.useState(null);
 
-  //表示する中身
+
+  const navigate = useNavigate();
+
+  async function onSubmit(e) { //フォームの送信イベントを処理する非同期関数
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    if (loading) return; 
+    if (error) setError(null); 
+    if (!e.target.checkValidity()) {
+      setError("フォームの入力が正しくありません");
+      setLoading(false);
+      return;
+    }
+    try { //ログイン処理を試みる
+      const form = e.target;
+      const formData = new FormData(form);
+      const email = formData.get("username");
+      const password = formData.get("password");
+      await signInWithEmailAndPassword(auth, email, password);
+      await addDoc(collection(db, "users"), {
+        email,loginAt: new Date()
+      });
+      navigate("/post");
+      // ログイン成功後の処理
+    } catch (err) {
+      if (err.code === "auth/user-not-found") {
+        setError("ユーザーが見つかりません");
+      } else if (err.code === "auth/wrong-password") {
+        setError("パスワードが間違っています");
+      }else if (err.code === "auth/invalid-credential") {
+        setError("メールアドレスまたはパスワードが正しくありません");
+      }else {
+        setError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
-    // アプリを包むコンテナ
-    <div className="app-container">
-      <div className="sidebar">
-        <h1>タスク管理アプリ</h1>
-
-        {/* メニューボタン */}
-        <button
-          className={`sidebar-button ${activeTab === "To Do" ? "active" : ""}`}
-          onClick={() => setActiveTab("To Do")}
-        >
-          To Do
-        </button>
-
-        <button
-          className={`sidebar-button ${
-            activeTab === "Records" ? "active" : ""
-          }`}
-          onClick={() => setActiveTab("Records")}
-        >
-          Records
-        </button>
-
-        <button
-          className={`sidebar-button ${activeTab === "Share" ? "active" : ""}`}
-          onClick={() => setActiveTab("Share")}
-        >
-          Share
-        </button>
+    <div className="login-container">
+      <div className="brand-panel">
+        <div className="logo">
+          <div className="logo-shape"></div>
+        </div>
+        <h1>TaskManager</h1>
       </div>
-
-      {/* 選ばれるタブ */}
-      <div className="main-content">
-        {activeTab === "To Do" && <h2>ToDo list</h2>}
-        {activeTab === "Records" && (
-          <>
-            <h2>Records</h2>
-            <Records />
-          </>
-        )}
-        {activeTab === "Share" && <h2>Share</h2>}
-      </div>
+      <div className="form-panel">
+        <form onSubmit={onSubmit}>
+          <div>
+            <label>
+              メールアドレス:
+              <input type="email" name="username" required />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              パスワード:
+            </label>
+            <div className= "password-input-container">
+              <input type={showpwd ? "text" : "password"} name="password" required />
+              <button type="button" onClick={() => setShowpwd(!showpwd)}>
+                {showpwd ? "非表示" : "表示"}
+              </button>
+            </div>
+          </div>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? "読み込み中..." : "ログイン"}
+          </button>
+          <p className="signup-link">
+            アカウントをお持ちでないですか？ <Link to="/register">新規登録</Link>
+          </p>
+        </form>
     </div>
+  </div>
   );
 }
 
