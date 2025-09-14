@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './Stopwatch.css'; // スタイルシートをインポート
+import React, { useState, useEffect, useRef } from "react";
+import "./Stopwatch.css"; // スタイルシートをインポート
 
 const Stopwatch = () => {
   // タイマーが実行中かどうかを管理する状態
@@ -38,10 +38,10 @@ const Stopwatch = () => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    
+
     // 数字を2桁にパディングするヘルパー関数
-    const pad = (num) => num.toString().padStart(2, '0');
-    
+    const pad = (num) => num.toString().padStart(2, "0");
+
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   };
 
@@ -61,23 +61,30 @@ const Stopwatch = () => {
   const handleSave = () => {
     const recordTime = formatTime(elapsedTime); // 現在の経過時間をフォーマット
     // 既存の記録リストに新しい記録を追加
-    setRecords(prevRecords => [...prevRecords, recordTime]);
+    setRecords((prevRecords) => [...prevRecords, recordTime]);
   };
 
   return (
     <div className="stopwatch-container">
       <h1>ストップウォッチ</h1>
       {/* 経過時間を表示 */}
-      <div id="display" className="display">{formatTime(elapsedTime)}</div>
+      <div id="display" className="display">
+        {formatTime(elapsedTime)}
+      </div>
       <div className="controls">
         {/* スタート/ストップボタン */}
         <button id="startStopBtn" onClick={handleStartStop}>
-          {isRunning ? 'ストップ' : 'スタート'} {/* isRunningの状態によってボタンのテキストを変更 */}
+          {isRunning ? "ストップ" : "スタート"}{" "}
+          {/* isRunningの状態によってボタンのテキストを変更 */}
         </button>
         {/* リセットボタン */}
-        <button id="resetBtn" onClick={handleReset}>リセット</button>
+        <button id="resetBtn" onClick={handleReset}>
+          リセット
+        </button>
         {/* 保存ボタン */}
-        <button id="saveBtn" onClick={handleSave}>保存</button>
+        <button id="saveBtn" onClick={handleSave}>
+          保存
+        </button>
       </div>
       <div className="records-container">
         <h2>記録</h2>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import "./App.css";
-import Records from "./Records.jsx";
+import "../../App.css";
+import Records from "../../components/records/Records.jsx";
 
 //関数を実行
 function App() {
