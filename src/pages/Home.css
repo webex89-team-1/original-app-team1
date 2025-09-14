@@ -1,0 +1,51 @@
+/* アプリ全体の並び */
+.app-container {
+  display: flex; /* 要素を横に並べる */
+  height: 100vh; /* 画面全体の高さを占める */
+  font-family: sans-serif; /* フォント */
+}
+
+/* 左側のサイドバー */
+.sidebar {
+  width: 400px; /* サイドバーの幅 */
+  padding: 25px;
+  background-color: #f5deb3;
+  border-right: 1px solid #ccc;
+
+  /* ボタンを縦に並べるための設定 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* ボタン間の間隔 */
+}
+
+/* サイドバーのボタン */
+.sidebar-button {
+  padding: 15px 20px;
+  background-color: #ffffe0;
+  border: 1px solid #ccc;
+  border-radius: 20px; /* ボタンの丸みをつける */
+  cursor: pointer; /* カーソルが手の形になる */
+  text-align: left;
+  transition: background-color 0.5s;
+}
+/* マウスを乗せたときのスタイル */
+.sidebar-button:hover {
+  background-color: #d2b48c;
+}
+
+/* 選択中のボタンのスタイル */
+.sidebar-button.active {
+  background-color: #d2b48c;
+  font-weight: bold; /* フォントを太字にする */
+}
+
+/* メインコンテンツ */
+.main-content {
+  flex-grow: 1; /* 残りのスペースをすべて占める */
+  padding: 20px;
+}
+
+.current-tab {
+  font-size: 1.2em;
+  font-weight: bold;
+}
