@@ -7,6 +7,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import './App.css';
 
+//関数を実行
 function App() {
   const [showpwd, setShowpwd] = React.useState(false);
   const[loading, setLoading] = React.useState(false);
