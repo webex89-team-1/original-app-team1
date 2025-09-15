@@ -1,268 +1,384 @@
-import React, { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
+import React, { useEffect, useRef, useState } from "react";
 
-// ---- 設定 ----
-const STORAGE_KEY = "todayTasks.v1"; // ローカルストレージのキー
-const GENRE_STORAGE_KEY = "genres.v1"; // ジャンル保存用キー
+/**
+ * ------------------------------------------------------------
+ * 共有：丸ボタン（クリック取りこぼし防止 & バリアント対応）
+ * ------------------------------------------------------------
+ */
+function CircleBtn({
+  children,
+  onClick,
+  title,
+  ariaLabel,
+  onMouseDownExtra,
+  variant = "default",
+}) {
+  // variant: default(グレー) | danger(赤) | info(水色)
+  const base =
+    "relative inline-grid place-items-center select-none cursor-pointer active:translate-y-[1px] leading-none z-10 rounded-full border-2";
+  const size = "w-7 h-7";
+  const styles =
+    variant === "danger"
+      ? "border-red-600 text-red-700 bg-white hover:bg-red-50"
+      : variant === "info"
+      ? "border-sky-500 text-sky-600 bg-white hover:bg-sky-50"
+      : "border-gray-600 text-gray-800 bg-white hover:bg-gray-50";
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel || title}
+      title={title}
+      onMouseDown={(e) => {
+        // フォーカス移動による input の onBlur 先行発火を防ぐ
+        e.preventDefault();
+        e.stopPropagation();
+        onMouseDownExtra?.(e);
+      }}
+      onTouchStart={(e) => {
+        e.stopPropagation();
+        onMouseDownExtra?.(e);
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.(e);
+      }}
+      className={[base, size, styles].join(" ")}
+    >
+      <span className="pointer-events-none">{children}</span>
+    </button>
+  );
+}
 
-function App() {
-  // ---- 状態 ----
-  const [tasks, setTasks] = useState([]);
-  const [title, setTitle] = useState("");
-  const [time, setTime] = useState("");
-  const [genres, setGenres] = useState([]); // {id, name}
+/** 一意ID生成 */
+const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 
-  // ---- 初期ロード ----
+/**
+ * ------------------------------------------------------------
+ * メイン：ジャンル & タスク UI
+ * ------------------------------------------------------------
+ */
+export default function GenreTaskManager() {
+  const [genres, setGenres] = useState([
+    {
+      id: uid(),
+      name: "家事",
+      tasks: [
+        { id: uid(), text: "買い物", done: true },
+        { id: uid(), text: "洗濯", done: true },
+        { id: uid(), text: "掃除", done: false },
+        { id: uid(), text: "申請", done: true },
+      ],
+    },
+    { id: uid(), name: "仕事", tasks: [] },
+    { id: uid(), name: "勉強", tasks: [] },
+  ]);
+
+  const [activeId, setActiveId] = useState(null);
+
+  // インライン編集（ジャンル名）
+  const [editingGenreId, setEditingGenreId] = useState(null);
+  const [genreDraft, setGenreDraft] = useState("");
+
+  // インライン編集（タスク名）
+  const [editingTask, setEditingTask] = useState({
+    genreId: null,
+    taskId: null,
+  });
+  const [taskDraft, setTaskDraft] = useState("");
+
+  // クリック時に input onBlur をスキップするためのフラグ
+  const suppressBlurRef = useRef(false);
+
+  // 初期選択
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setTasks(JSON.parse(raw));
-    } catch (e) {
-      console.warn("failed to load tasks", e);
-    }
-    try {
-      const graw = localStorage.getItem(GENRE_STORAGE_KEY);
-      if (graw) {
-        setGenres(JSON.parse(graw));
-      } else {
-        // デフォルトジャンル
-        setGenres([
-          { id: crypto.randomUUID ? crypto.randomUUID() : "g1", name: "家事" },
-          { id: crypto.randomUUID ? crypto.randomUUID() : "g2", name: "仕事" },
-          { id: crypto.randomUUID ? crypto.randomUUID() : "g3", name: "勉強" },
-        ]);
-      }
-    } catch (e) {
-      console.warn("failed to load genres", e);
-    }
-  }, []);
+    if (activeId == null && genres.length > 0) setActiveId(genres[0].id);
+  }, [activeId, genres.length]);
 
-  // ---- 自動保存 ----
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-    } catch (e) {
-      console.warn("failed to save tasks", e);
-    }
-  }, [tasks]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(GENRE_STORAGE_KEY, JSON.stringify(genres));
-    } catch (e) {
-      console.warn("failed to save genres", e);
-    }
-  }, [genres]);
-
-  // ---- タスクイベント ----
-  const addTask = (e) => {
-    e.preventDefault();
-    const t = title.trim();
-    if (!t) return;
-    const newTask = {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-      title: t,
-      time: time || undefined,
-      done: false,
-    };
-    setTasks((prev) => [...prev, newTask]);
-    setTitle("");
-    setTime("");
+  // --- ジャンル追加（＋後すぐに新しい四角でキャレット点滅＆入力） ---
+  const startAddGenre = () => {
+    const g = { id: uid(), name: "", tasks: [] };
+    setGenres((prev) => [...prev, g]);
+    setActiveId(g.id);
+    setEditingGenreId(g.id);
+    setGenreDraft("");
   };
 
-  const toggleDone = (id) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, done: !task.done } : task
+  // --- ジャンル削除（ID基準で確実に削除） ---
+  const removeGenre = (genreId) => {
+    // 確認ダイアログなしで即時削除（UX安定のため）
+    setGenres((prev) => {
+      const next = prev.filter((g) => g.id !== genreId);
+      // アクティブIDの整合
+      setActiveId((cur) => (cur === genreId ? next[0]?.id ?? null : cur));
+      return next;
+    });
+    // 編集状態のクリア
+    setEditingGenreId((cur) => (cur === genreId ? null : cur));
+  };
+
+  // --- ジャンル名編集 ---
+  const beginEditGenre = (e, genreId) => {
+    e.stopPropagation();
+    const g = genres.find((x) => x.id === genreId);
+    setEditingGenreId(genreId);
+    setGenreDraft(g?.name || "");
+  };
+  const commitEditGenre = () => {
+    let v = (genreDraft || "").trim();
+    if (!v) {
+      // 何も入力されなかった場合はデフォ名を付与
+      const index = genres.findIndex((x) => x.id === editingGenreId);
+      v = `新しいジャンル${index + 1}`;
+    }
+    setGenres((prev) =>
+      prev.map((g) => (g.id === editingGenreId ? { ...g, name: v } : g))
+    );
+    setEditingGenreId(null);
+  };
+  const cancelEditGenre = () => {
+    // 空のままキャンセルされたらデフォ名
+    if ((genreDraft || "").trim() === "") {
+      const index = genres.findIndex((x) => x.id === editingGenreId);
+      const v = `新しいジャンル${index + 1}`;
+      setGenres((prev) =>
+        prev.map((g) => (g.id === editingGenreId ? { ...g, name: v } : g))
+      );
+    }
+    setEditingGenreId(null);
+    setGenreDraft("");
+  };
+
+  // --- タスク操作（ID基準） ---
+  const addTask = (genreId, text) => {
+    const v = (text || "").trim();
+    if (!v) return;
+    const t = { id: uid(), text: v, done: false };
+    setGenres((prev) =>
+      prev.map((g) => (g.id === genreId ? { ...g, tasks: [...g.tasks, t] } : g))
+    );
+    setEditingTask({ genreId, taskId: t.id });
+    setTaskDraft(v);
+  };
+
+  const removeTask = (genreId, taskId) => {
+    setGenres((prev) =>
+      prev.map((g) =>
+        g.id === genreId
+          ? { ...g, tasks: g.tasks.filter((t) => t.id !== taskId) }
+          : g
+      )
+    );
+    setEditingTask((cur) =>
+      cur.genreId === genreId && cur.taskId === taskId
+        ? { genreId: null, taskId: null }
+        : cur
+    );
+    setTaskDraft("");
+  };
+
+  const toggleTask = (genreId, taskId) => {
+    setGenres((prev) =>
+      prev.map((g) =>
+        g.id === genreId
+          ? {
+              ...g,
+              tasks: g.tasks.map((t) =>
+                t.id === taskId ? { ...t, done: !t.done } : t
+              ),
+            }
+          : g
       )
     );
   };
 
-  const reloadFromStorage = () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      setTasks(raw ? JSON.parse(raw) : []);
-    } catch (e) {
-      console.warn("failed to reload tasks", e);
-    }
-    try {
-      const graw = localStorage.getItem(GENRE_STORAGE_KEY);
-      setGenres(graw ? JSON.parse(graw) : []);
-    } catch (e) {
-      console.warn("failed to reload genres", e);
-    }
+  // --- タスク編集 ---
+  const beginEditTask = (genreId, taskId) => {
+    const g = genres.find((x) => x.id === genreId);
+    const t = g?.tasks.find((x) => x.id === taskId);
+    setEditingTask({ genreId, taskId });
+    setTaskDraft(t?.text || "");
   };
-
-  // ---- ジャンル操作 ----
-  const addGenre = () => {
-    const name = prompt("ジャンル名を入力してください（例：家事）");
-    if (!name) return;
-    const trimmed = name.trim();
-    if (!trimmed) return;
-    const newGenre = {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-      name: trimmed,
-    };
-    setGenres((prev) => [...prev, newGenre]);
+  const commitEditTask = () => {
+    const { genreId, taskId } = editingTask;
+    const v = (taskDraft || "").trim();
+    if (!v) return cancelEditTask();
+    setGenres((prev) =>
+      prev.map((g) =>
+        g.id === genreId
+          ? {
+              ...g,
+              tasks: g.tasks.map((t) =>
+                t.id === taskId ? { ...t, text: v } : t
+              ),
+            }
+          : g
+      )
+    );
+    setEditingTask({ genreId: null, taskId: null });
+    setTaskDraft("");
   };
-
-  const deleteGenre = (id) => {
-    setGenres((prev) => prev.filter((g) => g.id !== id));
+  const cancelEditTask = () => {
+    setEditingTask({ genreId: null, taskId: null });
+    setTaskDraft("");
   };
 
   return (
-    <div className="container">
-      <style>{`
-        * { box-sizing: border-box; }
-        body { margin: 0; }
-        .container { display: flex; min-height: 100vh; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
-        .sidebar { width: 160px; background: #eeeeee; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-        .sidebar button { padding: 10px; border: none; background: #dddddd; border-radius: 8px; cursor: pointer; }
-        .sidebar button.active, .sidebar button:hover { background: #cfcfcf; }
-        .main { flex: 1; padding: 20px; }
-        .todo-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .genre, .today { border: 1px solid #aaa; border-radius: 10px; padding: 12px; background: #fff; }
-        .genre-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-        .circle-btn { width:28px; height:28px; border-radius:999px; border:1px solid #888; background:#fff; cursor:pointer; line-height:26px; text-align:center; font-weight:600; }
-        .circle-btn:hover { background:#f3f3f3; }
-        .category-row { display:flex; align-items:center; justify-content:space-between; }
-        .category-header { background: #d7d7d7; padding: 6px 8px; border-radius: 6px; margin-bottom: 6px; display: inline-block; }
-        .genre-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .genre-title { background: #d7d7d7; padding: 6px 8px; border-radius: 6px; }
-        .circle-btn { border: 1px solid #333; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 20px; cursor: pointer; background: #f5f5f5; }
-        .today h3 { display: flex; justify-content: space-between; align-items: center; margin: 0 0 10px; }
-        .icon-btn { border: none; background: transparent; cursor: pointer; font-size: 18px; }
-        .add-form { display: flex; gap: 8px; margin-bottom: 12px; }
-        .add-form input[type='text'] { flex: 1; padding: 8px 10px; border: 1px solid #bbb; border-radius: 8px; }
-        .add-form input[type='time'] { padding: 8px 10px; border: 1px solid #bbb; border-radius: 8px; }
-        .add-form button { padding: 8px 14px; border: none; border-radius: 8px; background: #333; color: #fff; cursor: pointer; }
-        .add-form button:hover { opacity: 0.9; }
-        .task-list { list-style: none; padding-left: 0; margin: 0; }
-        .task-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 8px; }
-        .task-text.done { text-decoration: line-through; opacity: 0.6; }
-      `}</style>
+    <div className="p-4 max-w-sm">
+      {/* 上部バー */}
+      <div className="flex items-center gap-2 mb-3">
+        <CircleBtn
+          title="ジャンルを追加"
+          ariaLabel="ジャンルを追加"
+          onClick={startAddGenre}
+          onMouseDownExtra={() => {
+            // 追加ボタンでの onBlur 先行発火を防ぐ
+            suppressBlurRef.current = true;
+          }}
+        >
+          ＋
+        </CircleBtn>
+        <div className="border-2 border-gray-600 px-3 py-1 rounded-lg font-semibold bg-white">
+          ジャンル
+        </div>
+      </div>
 
-      {/* サイドバー */}
-      <aside className="sidebar">
-        <button>Hello!</button>
-        <button className="active">To Do</button>
-        <button>Records</button>
-        <button>Tips</button>
-        <button>Share</button>
-      </aside>
+      {/* ジャンル一覧 */}
+      <div className="flex flex-col gap-3">
+        {genres.map((g) => (
+          <div
+            key={g.id}
+            className={`border-2 border-gray-600 rounded-lg px-2 py-1 ${
+              activeId === g.id ? "bg-gray-300" : "bg-white"
+            }`}
+            onClick={() => setActiveId(g.id)}
+            role="button"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm">^</span>
 
-      {/* メイン */}
-      <main className="main">
-        <h2>ホーム画面（タブ）</h2>
-        <div className="todo-section">
-          {/* 左：ジャンル */}
-          <section className="genre">
-            <div className="genre-header">
-              <button
-                className="circle-btn"
-                title="ジャンルを追加"
-                onClick={addGenre}
+              {/* ジャンル名：表示 or 入力（追加直後は入力でキャレット点滅） */}
+              {editingGenreId === g.id ? (
+                <input
+                  autoFocus
+                  value={genreDraft}
+                  onChange={(e) => setGenreDraft(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") commitEditGenre();
+                    if (e.key === "Escape") cancelEditGenre();
+                  }}
+                  onBlur={() => {
+                    // ボタン操作で発生した blur はスキップ（クリック後にリセット）
+                    if (suppressBlurRef.current) return;
+                    commitEditGenre();
+                  }}
+                  placeholder="ジャンル名を入力"
+                  className="flex-1 border-2 border-gray-600 rounded px-2 py-0.5 font-semibold"
+                />
+              ) : (
+                <button
+                  onClick={() => setActiveId(g.id)}
+                  onDoubleClick={(e) => beginEditGenre(e, g.id)}
+                  className="font-semibold flex-1 text-left"
+                  title="ダブルクリックで名前を編集"
+                >
+                  {g.name || "(名前未設定)"}
+                </button>
+              )}
+
+              <CircleBtn
+                variant="info"
+                title="ジャンルを削除"
+                ariaLabel="ジャンルを削除"
+                onMouseDownExtra={() => {
+                  suppressBlurRef.current = true;
+                }}
+                onClick={() => {
+                  // クリック処理の最後にフラグ解除
+                  removeGenre(g.id);
+                  suppressBlurRef.current = false;
+                }}
               >
-                ＋
-              </button>
-              <h3 style={{ margin: 0 }}>ジャンル</h3>
+                －
+              </CircleBtn>
             </div>
 
-            {genres.map((g) => (
-              <div className="category" key={g.id}>
-                <div className="category-row">
-                  <div className="category-header">{g.name}</div>
-                  <button
-                    className="circle-btn"
-                    title={`${g.name} を削除`}
-                    onClick={() => deleteGenre(g.id)}
-                  >
-                    －
-                  </button>
-                </div>
-                {g.name === "家事" && (
-                  <ul>
-                    <li>
-                      <input type="checkbox" disabled /> 買い物
-                    </li>
-                    <li>
-                      <input type="checkbox" disabled /> 洗濯
-                    </li>
-                    <li>
-                      <input type="checkbox" disabled /> 掃除
-                    </li>
-                    <li>
-                      <input type="checkbox" disabled /> 申請
-                    </li>
-                  </ul>
-                )}
+            {/* タスク表示 */}
+            {activeId === g.id && (
+              <div className="ml-5 mt-2 border-l-2 border-gray-400 pl-2">
+                {g.tasks.map((t) => (
+                  <div key={t.id} className="flex items-center gap-2 mb-1">
+                    {/* タスク名：表示 or 入力 */}
+                    {editingTask.genreId === g.id &&
+                    editingTask.taskId === t.id ? (
+                      <input
+                        autoFocus
+                        value={taskDraft}
+                        onChange={(e) => setTaskDraft(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") commitEditTask();
+                          if (e.key === "Escape") cancelEditTask();
+                        }}
+                        onBlur={commitEditTask}
+                        className="flex-1 border-2 border-gray-600 rounded px-2 py-0.5"
+                      />
+                    ) : (
+                      <label className="flex items-center gap-2 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={t.done}
+                          onChange={() => toggleTask(g.id, t.id)}
+                        />
+                        <span
+                          onDoubleClick={() => beginEditTask(g.id, t.id)}
+                          title="ダブルクリックで編集"
+                        >
+                          {t.text}
+                        </span>
+                      </label>
+                    )}
+
+                    <CircleBtn
+                      title="タスクを削除"
+                      ariaLabel="タスクを削除"
+                      onClick={() => removeTask(g.id, t.id)}
+                    >
+                      －
+                    </CircleBtn>
+                  </div>
+                ))}
+
+                {/* タスク追加（＋ボタンなし・Enter/フォーカス外しで追加） */}
+                <TaskInput onAdd={(txt) => addTask(g.id, txt)} />
               </div>
-            ))}
-          </section>
-
-          {/* 右：本日のタスク */}
-          <section className="today">
-            <h3>
-              本日のタスク
-              <button
-                className="icon-btn"
-                title="保存データを再読込"
-                onClick={reloadFromStorage}
-              >
-                ⟳
-              </button>
-            </h3>
-
-            {/* 追加フォーム */}
-            <form className="add-form" onSubmit={addTask}>
-              <input
-                type="text"
-                placeholder="タスク名（例：買い物）"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <input
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-              />
-              <button type="submit">追加</button>
-            </form>
-
-            {/* タスクリスト */}
-            <ul className="task-list">
-              {tasks.map((task) => (
-                <li key={task.id} className="task-item">
-                  <input
-                    type="checkbox"
-                    checked={!!task.done}
-                    onChange={() => toggleDone(task.id)}
-                  />
-                  <span className={"task-text" + (task.done ? " done" : "")}>
-                    {task.title}
-                    {task.time ? ` ${task.time}` : ""}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
-      </main>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-export default App;
-
-// --- 単体ファイルでのプレビュー用（ViCRA以外でも動くように） ---
-const mount = () => {
-  const rootEl = document.getElementById("root");
-  if (rootEl) {
-    const root = createRoot(rootEl);
-    root.render(<App />);
-  }
-};
-
-if (typeof document !== "undefined") {
-  mount();
+/** タスク入力（Enter or blur で追加） */
+function TaskInput({ onAdd }) {
+  const [text, setText] = useState("");
+  const commit = () => {
+    const v = (text || "").trim();
+    if (!v) return;
+    onAdd(v);
+    setText("");
+  };
+  return (
+    <div className="mt-2">
+      <input
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && commit()}
+        onBlur={() => commit()}
+        placeholder="タスク"
+        className="w-full border-2 border-gray-600 rounded px-2 py-1"
+      />
+    </div>
+  );
 }
