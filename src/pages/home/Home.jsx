@@ -1,6 +1,8 @@
 import { useState } from "react";
 import "../../App.css";
 import Records from "../../components/records/Records.jsx";
+import DailyTaskList from "../DailyTaskList.jsx";
+import Post from "../../components/post/Post.jsx";
 
 //関数を実行
 function App() {
@@ -41,14 +43,24 @@ function App() {
 
       {/* 選ばれるタブ */}
       <div className="main-content">
-        {activeTab === "To Do" && <h2>ToDo list</h2>}
+        {activeTab === "To Do" && (
+          <>
+            <h2>ToDo list</h2>
+            <DailyTaskList />
+          </>
+        )}
         {activeTab === "Records" && (
           <>
             <h2>Records</h2>
             <Records />
           </>
         )}
-        {activeTab === "Share" && <h2>Share</h2>}
+        {activeTab === "Share" && (
+          <>
+            <h2>Share</h2>
+            <Post />
+          </>
+        )}
       </div>
     </div>
   );
