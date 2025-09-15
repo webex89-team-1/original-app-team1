@@ -5,6 +5,7 @@ import Avatar from "../components/avatar/Avatar.jsx";
 import Home from "../pages/home/Home.jsx";
 import Post from "../components/post/Post.jsx";
 import DailyTaskList from "../pages/DailyTaskList";
+import Test from "../pages/test/Test.jsx";
 
 export default function Router() {
   return (
@@ -14,7 +15,8 @@ export default function Router() {
       <Route path="/avatar" element={<Avatar />} />
       <Route path="/home" element={<Home />} />
       <Route path="/post" element={<Post />} />
-      <Route path="/daily-task-list" element={<DailyTaskList />}/>
+      <Route path="/daily-task-list" element={<DailyTaskList />} />
+      <Route path="/test" element={<Test />} />
       <Route path="*" element={<div>404 Not Found</div>} />
     </Routes>
   );
