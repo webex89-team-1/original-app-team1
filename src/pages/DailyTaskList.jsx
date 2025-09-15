@@ -57,6 +57,21 @@ const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
  * メイン：ジャンル & タスク UI
  * ------------------------------------------------------------
  */
+export const genreData = [
+  {
+    id: uid(),
+    name: "家事",
+    tasks: [
+      { id: uid(), text: "買い物", done: true },
+      { id: uid(), text: "洗濯", done: true },
+      { id: uid(), text: "掃除", done: false },
+      { id: uid(), text: "申請", done: true },
+    ],
+  },
+  { id: uid(), name: "仕事", tasks: [] },
+  { id: uid(), name: "勉強", tasks: [] },
+];
+
 export default function GenreTaskManager() {
   const [genres, setGenres] = useState([
     {

@@ -20,6 +20,8 @@ const data = [
   { day: "3日目", time: 150 },
 ];
 
+import { genreData } from "../../pages/DailyTaskList";
+
 function Records() {
   const [showGraph, setShowGraph] = useState(false);
 
