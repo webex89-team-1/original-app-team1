@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db } from "./firebase";
 import { useNavigate } from "react-router-dom";
+import { doc, setDoc } from "firebase/firestore";
 import './App.css';
 
 
@@ -28,7 +29,19 @@ function Register() {
       return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // ユーザープロファイルに名前を更新
+      await updateProfile(user, {
+        displayName: name,
+      });
+
+      // Firestoreにユーザー情報を保存
+      await setDoc(doc(db, "users", user.uid), {
+        name: name,
+        email: email,
+      });
       navigate("/avatar");
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
@@ -51,7 +64,7 @@ function Register() {
         <div className="logo">
           <div className="logo-shape"></div>
         </div>
-        <h1>TaskManager</h1>
+        <h1>タスク管理</h1>
         <p>新規アカウント登録</p>
       </div>
 

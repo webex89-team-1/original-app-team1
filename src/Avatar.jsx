@@ -6,15 +6,15 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 function Avatar() {
     const Picture_Avatar= [
-        {id:1, image:"./images/avatar1.png"},//↓ここに画像のパスを入れる
-        {id:2, image:"./images/avatar2.png"},
-        {id:3, image:"./images/avatar3.png"},  
-        {id:4, image:"./images/avatar4.png"},
-        {id:5, image:"./images/avatar5.png"},
-        {id:6, image:"./images/avatar6.png"},
-        {id:7, image:"./images/avatar7.png"},
-        {id:8, image:"./images/avatar8.png"},
-        {id:9, image:"./images/avatar9.png"},
+        {id:1, image:"/images/avatar1.png"},
+        {id:2, image:"/images/avatar2.png"},
+        {id:3, image:"/images/avatar3.png"},  
+        {id:4, image:"/images/avatar4.png"},
+        {id:5, image:"/images/avatar5.png"},
+        {id:6, image:"/images/avatar6.png"},
+        {id:7, image:"/images/avatar7.png"},
+        {id:8, image:"/images/avatar8.png"},
+        {id:9, image:"/images/avatar9.png"},
 
     ];
     const navigate = useNavigate();
@@ -25,25 +25,28 @@ function Avatar() {
 
 
     async function DatabaseFunction() {
+        setLoading(true);
         const auth = getAuth();
         const user = auth.currentUser;
-        if (user) {
+        if (user && selectedAvatar) {
+            const avatarUrl = `/images/avatar${selectedAvatar}.png`;
             try {
                 await updateProfile(user, {
-                    photoURL: `./images/avatar${selectedAvatar}.png` //選択されたアバターの画像パスを設定
+                    photoURL: avatarUrl
                 });
                 const db = getFirestore();
                 await setDoc(doc(db, "users", user.uid), {
                     avatar: selectedAvatar,
+                    photoURL: avatarUrl,
                 }, { merge: true });
-                navigate("/home");
+                navigate("/check");
             } catch (error) {
                 console.error("アバター選択の更新に失敗しました：", error);
                 alert("アバター選択の更新に失敗しました。もう一度お試しください。");
             } finally {
                 setLoading(false);
             }
-        } else {
+        } else if (!user) {
             navigate("/login");
             setLoading(false);
         }
@@ -58,7 +61,7 @@ function Avatar() {
             <div className = "logo">
                 <div className = "logo-shape"></div>
             </div>
-            <h1>TaskManager</h1>
+            <h1>タスク管理</h1>
         </div>
         <div className = "form-panel">
             <div className = "Avater-panel">

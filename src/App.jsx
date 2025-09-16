@@ -58,7 +58,7 @@ function App() {
         <div className="logo">
           <div className="logo-shape"></div>
         </div>
-        <h1>TaskManager</h1>
+        <h1>タスク管理</h1>
       </div>
       <div className="form-panel">
         <form onSubmit={onSubmit}>

@@ -6,8 +6,9 @@ import Notification from "../pages/Notification.jsx";
 import User from "../pages/User.jsx";
 import Register from "../Register.jsx";
 import Avatar from "../Avatar.jsx";
-import Home from "../Home.jsx";
+import Home from "../pages/Home.jsx"; // `src/pages/Home.jsx` をインポート
 import Post from "../Post.jsx";
+import Check from "../Check.jsx";
 
 export default function Router() {
   return (
@@ -21,6 +22,7 @@ export default function Router() {
         <Route path="/avatar" element={<Avatar />} />
         <Route path="/home" element={<Home />} />
         <Route path="/post" element={<Post />} />
+        <Route path="/check" element={<Check />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
   );

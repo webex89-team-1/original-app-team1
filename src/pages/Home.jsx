@@ -1,11 +1,13 @@
 import { useState } from "react";
-import "./App.css";
+import "../App.css";
 import Records from "./Records.jsx";
+import { useNavigate } from "react-router-dom";
 
 //関数を実行
-function App() {
+function Home() {
   //初期値をToDoに設定
   const [activeTab, setActiveTab] = useState("To Do"); //状態管理を設定して、初期値を"ToDo"にする
+  const navigate = useNavigate();
 
   //表示する中身
   return (
@@ -32,10 +34,10 @@ function App() {
         </button>
 
         <button
-          className={`sidebar-button ${activeTab === "Share" ? "active" : ""}`}
-          onClick={() => setActiveTab("Share")}
+          className="sidebar-button"
+          onClick={() => navigate("/post")}
         >
-          Share
+          Post
         </button>
       </div>
 
@@ -48,10 +50,9 @@ function App() {
             <Records />
           </>
         )}
-        {activeTab === "Share" && <h2>Share</h2>}
       </div>
     </div>
   );
 }
 
-export default App;
+export default Home;

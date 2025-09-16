@@ -1,0 +1,307 @@
+/* --- ホーム画面と投稿画面のレイアウト --- */
+.home-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: #FFFBEB; /* 全体の背景色: とても薄い黄色 */
+    overflow: hidden;
+}
+
+.home-container .sidebar {
+    width: 280px;
+    background-color: #FEFCE8; /* サイドバーの背景色: 全体より少し明るい黄色 */
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    flex-shrink: 0;
+}
+
+.home-container .profile-summary {
+    padding: 0 20px 20px 20px;
+    text-align: center;
+    border-bottom: 1px solid #F3F4F6; /* Gray 100 */
+}
+
+.home-container .sidebar-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 10px; /* 中央寄せ */
+    border: 2px solid #ddd;
+    background-size: cover;
+    background-position: center;
+    background-color: #ccc; /* 画像がない場合のプレースホルダー色 */
+}
+
+.home-container .profile-summary h4 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #374151; /* Gray 700 */
+}
+
+.home-container .sidebar-button {
+    width: 100%;
+    padding: 15px 20px;
+    background-color: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    text-align: left;
+    font-size: 1em;
+    color: #4B5563; /* Gray 600 */
+    transition: all 0.2s ease;
+}
+
+.home-container .sidebar-button:hover {
+    background-color: #FFFBEB; /* 全体背景と同じ色 */
+    color: #B45309; /* Amber 700 */
+}
+
+.home-container .sidebar-button.active {
+    background-color: #FEF3C7; /* Amber 200 */
+    border-left: 3px solid #FBBF24; /* Amber 400 */
+    color: #92400E; /* Amber 800 */
+    font-weight: bold;
+}
+
+.home-container .logout-button {
+    margin-top: auto;
+    border-top: 1px solid #F3F4F6; /* Gray 100 */
+    color: #ff4d4f;
+}
+
+.home-container .logout-button:hover {
+    background-color: #fff1f0;
+    color: #cf1322;
+}
+
+.home-container .main-content {
+    flex-grow: 1;
+    padding: 0;
+    overflow: hidden; /* 子要素でスクロールを制御 */
+    display: flex;
+    flex-direction: column; /* 上下に配置 */
+}
+
+/* --- 投稿パネルのスタイル --- */
+.post-form-container {
+    flex-shrink: 0;
+    position: relative; /* エラーメッセージの配置基準 */
+    background-color: #FEFCE8; /* サイドバーと同じ */
+    padding: 20px 30px;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+}
+
+.post-list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #FFFFFF; /* 投稿リストは白背景で見やすく */
+    padding: 30px;
+}
+
+.post-form {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.input-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.post-form input,
+.post-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #E5E7EB; /* Gray 200 */
+    border-radius: 8px;
+    background-color: #FFFBEB; /* 全体背景と同じ */
+    font-size: 1em;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.post-form input:focus,
+.post-form textarea:focus {
+    border-color: #FBBF24; /* Amber 400 */
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3);
+    outline: none;
+}
+
+.post-form textarea {
+    min-height: 48px; /* inputの高さに合わせる */
+    resize: none;
+    overflow-y: hidden; /* スクロールバーを隠す */
+}
+
+.submit-post-button {
+    align-self: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    background-color: #FBBF24; /* Amber 400 */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.8em;
+    line-height: 1;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.submit-post-button:hover {
+    background-color: #F59E0B; /* Amber 500 */
+    transform: scale(1.05);
+}
+
+.post-form-error {
+    color: red;
+    margin-top: 10px;
+}
+
+.post-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  list-style-type: none; /* liの黒丸を消す */
+}
+
+.post-avatar .avatar-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* 画像がない場合や読み込み中に表示される背景色 */
+  background-color: #ccc;
+}
+
+.post-content-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.post-author-name {
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.post-item h3 { margin: 0 0 8px 0; font-size: 1.1em; }
+.post-item p { margin: 0; white-space: pre-wrap; word-break: break-word; }
+
+.post-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.post-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.like-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em; /* ハートのサイズ */
+  padding: 0;
+  transition: all 0.2s ease;
+  filter: grayscale(100%); /* デフォルトはグレー */
+  opacity: 0.7;
+}
+
+.like-button:hover {
+  transform: scale(1.2);
+}
+
+.like-button.liked {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.like-count {
+  font-size: 1em;
+  color: #555;
+  font-weight: bold;
+}
+
+.retweet-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em; /* アイコンのサイズ */
+  padding: 0;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.retweet-button:hover {
+  transform: scale(1.2);
+}
+
+.retweet-button.retweeted {
+  /* リツイート済みの色を緑っぽくします */
+  filter: sepia(100%) hue-rotate(80deg) saturate(500%);
+  opacity: 1;
+}
+
+.retweet-count {
+  font-size: 1em;
+  color: #555;
+  font-weight: bold;
+}
+
+.loading-fullscreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5em;
+  color: #555;
+}
+
+/* --- リツイート投稿のスタイル --- */
+.retweet-item {
+  background-color: #f8f9fa;
+  border-left: 4px solid #9CA3AF; /* Gray 400 */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 20px;
+}
+
+.retweet-header {
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 10px;
+  font-weight: bold;
+  padding-left: 20px;
+}
+
+.original-post-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background-color: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  margin-left: 20px;
+}
