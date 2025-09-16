@@ -84,16 +84,7 @@ function Post() {
 
   return (
     <div className="home-container">
-      <div className="tab-panel">
-        <div className="profile-panel">
-          <button onClick={() => navigate("/profile")}>Go to Profile</button>
-        </div>
-        <button onClick={() => navigate("/home")}>Home</button>
-        <button onClick={() => navigate("/stopwatch")}>Stopwatch</button>
-        <button onClick={() => navigate("/post")}>Post</button>
-        <button onClick={() => navigate("/profile")}>Profile</button>
-        <button onClick={() => navigate("/")}>Logout</button>
-      </div>
+      {/* サイドバー削除: tab-panel 全体を消した */}
       <div className="post-panel">
         <h2>Posts</h2>
         <div className="post-form">

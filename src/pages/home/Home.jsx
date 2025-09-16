@@ -3,6 +3,7 @@ import "../../App.css";
 import Records from "../../components/records/Records.jsx";
 import DailyTaskList from "../DailyTaskList.jsx";
 import Post from "../../components/post/Post.jsx";
+import { genreData } from "../DailyTaskList.jsx";
 
 //関数を実行
 function App() {
