@@ -52,7 +52,10 @@ function App() {
         {activeTab === "Records" && (
           <>
             <h2>Records</h2>
-            <Records />
+            <div className="flex">
+              <DailyTaskList />
+              <Records />
+            </div>
           </>
         )}
         {activeTab === "Share" && (
