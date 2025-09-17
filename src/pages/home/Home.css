@@ -1,0 +1,58 @@
+/* アプリ全体の並び */
+.app-container {
+  height: 100vh; /* 画面全体の高さを占める */
+  font-family: sans-serif; /* フォント */
+}
+
+/* 左側のサイドバー */
+.sidebar {
+  position: fixed; /* 固定位置に配置 */
+  top: 0; /* 画面上端に配置 */
+  left: 0; /* 画面左端に配置 */
+  width: 400px; /* サイドバーの幅 */
+  height: 100vh; /* 画面全体の高さを占める */
+  padding: 25px;
+  background-color: #f5deb3;
+  border-right: 1px solid #ccc;
+  box-sizing: border-box; /* パディングを幅に含める */
+
+  /* ボタンを縦に並べるための設定 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* ボタン間の間隔 */
+  z-index: 1000; /* 他の要素より前面に表示 */
+}
+
+/* サイドバーのボタン */
+.sidebar-button {
+  padding: 15px 20px;
+  background-color: #ffffe0;
+  border: 1px solid #ccc;
+  border-radius: 20px; /* ボタンの丸みをつける */
+  cursor: pointer; /* カーソルが手の形になる */
+  text-align: left;
+  transition: background-color 0.5s;
+}
+
+/* マウスを乗せたときのスタイル */
+.sidebar-button:hover {
+  background-color: #d2b48c;
+}
+
+/* 選択中のボタンのスタイル */
+.sidebar-button.active {
+  background-color: #d2b48c;
+  font-weight: bold; /* フォントを太字にする */
+}
+
+/* メインコンテンツ */
+.main-content {
+  margin-left: 450px; /* サイドバーの幅(400px) + パディング(25px×2) 分のマージン */
+  padding: 20px;
+  min-height: 100vh; /* 最小の高さを画面全体に設定 */
+}
+
+.current-tab {
+  font-size: 1.2em;
+  font-weight: bold;
+}

@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 
+/**
+ * ------------------------------------------------------------
+ * 共有：丸ボタン（クリック取りこぼし防止 & バリアント対応）
+ * ------------------------------------------------------------
+ */
 function CircleBtn({
   children,
   onClick,
@@ -8,6 +13,7 @@ function CircleBtn({
   onMouseDownExtra,
   variant = "default",
 }) {
+  // variant: default(グレー) | danger(赤) | info(水色)
   const base =
     "relative inline-grid place-items-center select-none cursor-pointer active:translate-y-[1px] leading-none z-10 rounded-full border-2";
   const size = "w-7 h-7";
@@ -23,6 +29,7 @@ function CircleBtn({
       aria-label={ariaLabel || title}
       title={title}
       onMouseDown={(e) => {
+        // フォーカス移動による input の onBlur 先行発火を防ぐ
         e.preventDefault();
         e.stopPropagation();
         onMouseDownExtra?.(e);
@@ -55,6 +62,7 @@ export default function GenreTaskManager() {
   const [activeId, setActiveId] = useState(initialGenre.id);
   const [editingGenreId, setEditingGenreId] = useState(null);
   const [genreDraft, setGenreDraft] = useState("");
+
   const [editingTask, setEditingTask] = useState({
     genreId: null,
     taskId: null,
@@ -156,6 +164,7 @@ export default function GenreTaskManager() {
     setEditingTask({ genreId, taskId });
     setTaskDraft(t?.text || "");
   };
+
   const commitEditTask = () => {
     const { genreId, taskId } = editingTask;
     const v = (taskDraft || "").trim();
@@ -182,12 +191,14 @@ export default function GenreTaskManager() {
 
   return (
     <div className="p-4 max-w-sm">
+      {/* 上部バー */}
       <div className="flex items-center gap-2 mb-3">
         <CircleBtn
           title="ジャンルを追加"
           ariaLabel="ジャンルを追加"
           onClick={startAddGenre}
           onMouseDownExtra={() => {
+            // 追加ボタンでの onBlur 先行発火を防ぐ
             suppressBlurRef.current = true;
           }}
         >
@@ -236,6 +247,7 @@ export default function GenreTaskManager() {
                   {g.name || "(名前未設定)"}
                 </button>
               )}
+
               <CircleBtn
                 variant="info"
                 title="ジャンルを削除"
@@ -244,6 +256,7 @@ export default function GenreTaskManager() {
                   suppressBlurRef.current = true;
                 }}
                 onClick={() => {
+                  // クリック処理の最後にフラグ解除
                   removeGenre(g.id);
                   suppressBlurRef.current = false;
                 }}
@@ -252,10 +265,12 @@ export default function GenreTaskManager() {
               </CircleBtn>
             </div>
 
+            {/* タスク表示 */}
             {activeId === g.id && (
               <div className="ml-5 mt-2 border-l-2 border-gray-400 pl-2">
                 {g.tasks.map((t) => (
                   <div key={t.id} className="flex items-center gap-2 mb-1">
+                    {/* タスク名：表示 or 入力 */}
                     {editingTask.genreId === g.id &&
                     editingTask.taskId === t.id ? (
                       <input
@@ -293,6 +308,8 @@ export default function GenreTaskManager() {
                     </CircleBtn>
                   </div>
                 ))}
+
+                {/* タスク追加（＋ボタンなし・Enter/フォーカス外しで追加） */}
                 <TaskInput onAdd={(txt) => addTask(g.id, txt)} />
               </div>
             )}
@@ -303,6 +320,7 @@ export default function GenreTaskManager() {
   );
 }
 
+/** タスク入力（Enter or blur で追加） */
 function TaskInput({ onAdd }) {
   const [text, setText] = useState("");
   const commit = () => {
@@ -325,4 +343,3 @@ function TaskInput({ onAdd }) {
     </div>
   );
 }
-s
