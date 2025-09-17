@@ -20,6 +20,8 @@ const categories = [
   { id: "hobby", label: "趣味" },
 ];
 
+import { genreData } from "../../pages/DailyTaskList";
+
 function Records() {
   const [selectedCategory, setSelectedCategory] = useState("work");
 
