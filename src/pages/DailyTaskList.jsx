@@ -49,67 +49,27 @@ function CircleBtn({
   );
 }
 
-/** 一意ID生成 */
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 
-/**
- * ------------------------------------------------------------
- * メイン：ジャンル & タスク UI
- * ------------------------------------------------------------
- */
-export const genreData = [
-  {
-    id: uid(),
-    name: "家事",
-    tasks: [
-      { id: uid(), text: "買い物", done: true },
-      { id: uid(), text: "洗濯", done: true },
-      { id: uid(), text: "掃除", done: false },
-      { id: uid(), text: "申請", done: true },
-    ],
-  },
-  { id: uid(), name: "仕事", tasks: [] },
-  { id: uid(), name: "勉強", tasks: [] },
-];
-
 export default function GenreTaskManager() {
-  const [genres, setGenres] = useState([
-    {
-      id: uid(),
-      name: "家事",
-      tasks: [
-        { id: uid(), text: "買い物", done: true },
-        { id: uid(), text: "洗濯", done: true },
-        { id: uid(), text: "掃除", done: false },
-        { id: uid(), text: "申請", done: true },
-      ],
-    },
-    { id: uid(), name: "仕事", tasks: [] },
-    { id: uid(), name: "勉強", tasks: [] },
-  ]);
+  const initialGenre = {
+    id: uid(),
+    name: "あなたのやること",
+    tasks: [{ id: uid(), text: "1つ目", done: false }],
+  };
 
-  const [activeId, setActiveId] = useState(null);
-
-  // インライン編集（ジャンル名）
+  const [genres, setGenres] = useState([initialGenre]);
+  const [activeId, setActiveId] = useState(initialGenre.id);
   const [editingGenreId, setEditingGenreId] = useState(null);
   const [genreDraft, setGenreDraft] = useState("");
 
-  // インライン編集（タスク名）
   const [editingTask, setEditingTask] = useState({
     genreId: null,
     taskId: null,
   });
   const [taskDraft, setTaskDraft] = useState("");
-
-  // クリック時に input onBlur をスキップするためのフラグ
   const suppressBlurRef = useRef(false);
 
-  // 初期選択
-  useEffect(() => {
-    if (activeId == null && genres.length > 0) setActiveId(genres[0].id);
-  }, [activeId, genres.length]);
-
-  // --- ジャンル追加（＋後すぐに新しい四角でキャレット点滅＆入力） ---
   const startAddGenre = () => {
     const g = { id: uid(), name: "", tasks: [] };
     setGenres((prev) => [...prev, g]);
@@ -118,20 +78,15 @@ export default function GenreTaskManager() {
     setGenreDraft("");
   };
 
-  // --- ジャンル削除（ID基準で確実に削除） ---
   const removeGenre = (genreId) => {
-    // 確認ダイアログなしで即時削除（UX安定のため）
     setGenres((prev) => {
       const next = prev.filter((g) => g.id !== genreId);
-      // アクティブIDの整合
       setActiveId((cur) => (cur === genreId ? next[0]?.id ?? null : cur));
       return next;
     });
-    // 編集状態のクリア
     setEditingGenreId((cur) => (cur === genreId ? null : cur));
   };
 
-  // --- ジャンル名編集 ---
   const beginEditGenre = (e, genreId) => {
     e.stopPropagation();
     const g = genres.find((x) => x.id === genreId);
@@ -141,7 +96,6 @@ export default function GenreTaskManager() {
   const commitEditGenre = () => {
     let v = (genreDraft || "").trim();
     if (!v) {
-      // 何も入力されなかった場合はデフォ名を付与
       const index = genres.findIndex((x) => x.id === editingGenreId);
       v = `新しいジャンル${index + 1}`;
     }
@@ -151,7 +105,6 @@ export default function GenreTaskManager() {
     setEditingGenreId(null);
   };
   const cancelEditGenre = () => {
-    // 空のままキャンセルされたらデフォ名
     if ((genreDraft || "").trim() === "") {
       const index = genres.findIndex((x) => x.id === editingGenreId);
       const v = `新しいジャンル${index + 1}`;
@@ -163,7 +116,6 @@ export default function GenreTaskManager() {
     setGenreDraft("");
   };
 
-  // --- タスク操作（ID基準） ---
   const addTask = (genreId, text) => {
     const v = (text || "").trim();
     if (!v) return;
@@ -206,13 +158,13 @@ export default function GenreTaskManager() {
     );
   };
 
-  // --- タスク編集 ---
   const beginEditTask = (genreId, taskId) => {
     const g = genres.find((x) => x.id === genreId);
     const t = g?.tasks.find((x) => x.id === taskId);
     setEditingTask({ genreId, taskId });
     setTaskDraft(t?.text || "");
   };
+
   const commitEditTask = () => {
     const { genreId, taskId } = editingTask;
     const v = (taskDraft || "").trim();
@@ -257,7 +209,6 @@ export default function GenreTaskManager() {
         </div>
       </div>
 
-      {/* ジャンル一覧 */}
       <div className="flex flex-col gap-3">
         {genres.map((g) => (
           <div
@@ -269,9 +220,6 @@ export default function GenreTaskManager() {
             role="button"
           >
             <div className="flex items-center gap-2">
-              <span className="text-sm">^</span>
-
-              {/* ジャンル名：表示 or 入力（追加直後は入力でキャレット点滅） */}
               {editingGenreId === g.id ? (
                 <input
                   autoFocus
@@ -283,7 +231,6 @@ export default function GenreTaskManager() {
                     if (e.key === "Escape") cancelEditGenre();
                   }}
                   onBlur={() => {
-                    // ボタン操作で発生した blur はスキップ（クリック後にリセット）
                     if (suppressBlurRef.current) return;
                     commitEditGenre();
                   }}
@@ -352,7 +299,6 @@ export default function GenreTaskManager() {
                         </span>
                       </label>
                     )}
-
                     <CircleBtn
                       title="タスクを削除"
                       ariaLabel="タスクを削除"
